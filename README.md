@@ -1,6 +1,6 @@
 # App Core Packages
 
-Shared Swift packages used by CleanTemplate-based apps. This repo exposes a single multi-product Swift package that groups the core modules.
+Shared Swift packages for iOS apps. This repo exposes a single multi-product Swift package that groups the core modules.
 
 ## Packages
 
@@ -31,11 +31,11 @@ Add products to targets:
 .target(
     name: "MyApp",
     dependencies: [
-        .product(name: "Domain", package: "app-core-packages"),
-        .product(name: "Data", package: "app-core-packages"),
-        .product(name: "Networking", package: "app-core-packages"),
-        .product(name: "LocalPersistance", package: "app-core-packages"),
-        .product(name: "DesignSystem", package: "app-core-packages")
+        .product(name: "Domain", package: "AppCorePackages"),
+        .product(name: "Data", package: "AppCorePackages"),
+        .product(name: "Networking", package: "AppCorePackages"),
+        .product(name: "LocalPersistance", package: "AppCorePackages"),
+        .product(name: "DesignSystem", package: "AppCorePackages")
     ]
 )
 ```
