@@ -57,8 +57,8 @@ public struct DSChoiceButton: View {
                     .foregroundStyle(isSelected ? Color.textPrimary : Color.textTertiary)
             }
             .padding(.horizontal, DSSpacing.md)
-            .padding(.vertical, DSSpacing.smd)
-            .frame(minHeight: 52)
+            .padding(.vertical, DSSpacing.sm)
+            .frame(minHeight: 48)
             .background(backgroundColor)
             .overlay(
                 shape.stroke(borderColor, lineWidth: borderWidth)

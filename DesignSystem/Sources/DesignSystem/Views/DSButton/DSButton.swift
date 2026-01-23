@@ -386,7 +386,7 @@ public enum DSIconButtonSize {
 
     var iconSize: CGFloat {
         switch self {
-        case .small: return 14
+        case .small: return 16
         case .medium: return 18
         case .large: return 22
         }
@@ -394,8 +394,8 @@ public enum DSIconButtonSize {
 
     var dimension: CGFloat {
         switch self {
-        case .small: return 32
-        case .medium: return 44
+        case .small: return 44
+        case .medium: return 48
         case .large: return 56
         }
     }
