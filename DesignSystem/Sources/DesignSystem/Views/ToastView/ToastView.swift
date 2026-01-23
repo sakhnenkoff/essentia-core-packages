@@ -71,29 +71,32 @@ public struct ToastView: View {
     }
 
     public var body: some View {
-        HStack(alignment: .center, spacing: DSSpacing.smd) {
+        HStack(alignment: .center, spacing: DSSpacing.sm) {
             Image(systemName: toast.style.icon)
-                .foregroundStyle(.white)
-                .font(.headlineMedium())
+                .foregroundStyle(toast.style.backgroundColor)
+                .font(.system(size: 18, weight: .medium))
 
             Text(toast.message)
                 .font(.bodySmall())
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.textPrimary)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Button(action: onDismiss) {
                 Image(systemName: "xmark")
-                    .foregroundStyle(.white.opacity(0.8))
-                    .font(.captionLarge())
+                    .foregroundStyle(Color.textTertiary)
+                    .font(.system(size: 12, weight: .medium))
             }
         }
         .padding(.horizontal, DSSpacing.md)
-        .padding(.vertical, DSSpacing.smd)
-        .background(toast.style.backgroundColor)
-        .clipShape(RoundedRectangle(cornerRadius: DSSpacing.smd))
-        .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
-        .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+        .padding(.vertical, DSSpacing.md)
+        .glassSurface(
+            cornerRadius: DSRadii.md,
+            tint: toast.style.backgroundColor.opacity(0.08),
+            borderColor: toast.style.backgroundColor.opacity(0.15),
+            shadow: DSShadows.card,
+            isInteractive: false
+        )
         .padding(.horizontal, DSSpacing.md)
     }
 }

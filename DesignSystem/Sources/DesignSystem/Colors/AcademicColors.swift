@@ -26,8 +26,8 @@ public extension Color {
     /// Off-white primary background
     static let canvasWhite = Color(hex: "E9E7E3")
 
-    /// Subtle surface tint
-    static let surfaceTint = Color(hex: "E9E6F0")
+    /// Subtle surface tint (warm neutral)
+    static let surfaceTint = Color(hex: "EFECEA")
 
     /// Soft border
     static let borderLight = Color(hex: "D8D4CF")
