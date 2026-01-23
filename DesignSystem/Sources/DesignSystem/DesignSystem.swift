@@ -53,6 +53,10 @@ public enum DesignSystem {
 
         _theme = theme
         isConfigured = true
+
+        #if canImport(UIKit)
+        DesignSystemAppearance.apply(using: theme.tokens)
+        #endif
     }
 
     /// Configure with the default theme (useful for explicit initialization)

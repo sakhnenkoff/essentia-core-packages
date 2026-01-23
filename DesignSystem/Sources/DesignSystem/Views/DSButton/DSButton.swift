@@ -202,10 +202,10 @@ public enum DSButtonStyle {
 
     var usesGlass: Bool {
         switch self {
-        case .tertiary:
-            return false
-        default:
+        case .primary:
             return true
+        default:
+            return false
         }
     }
 
@@ -356,30 +356,34 @@ public struct DSIconButton: View {
     let icon: String
     let style: DSButtonStyle
     let size: DSIconButtonSize
+    let usesGlass: Bool
     let action: (() -> Void)?
 
     public init(
         icon: String,
         style: DSButtonStyle = .tertiary,
         size: DSIconButtonSize = .medium,
+        usesGlass: Bool = false,
         action: (() -> Void)? = nil
     ) {
         self.icon = icon
         self.style = style
         self.size = size
+        self.usesGlass = usesGlass
         self.action = action
     }
 
     public var body: some View {
-        IconTileButton(
-            systemName: icon,
-            size: size.dimension,
-            iconSize: size.iconSize,
-            tint: iconTint,
-            backgroundTint: iconBackground,
-            usesGlass: iconUsesGlass,
-            action: action
-        )
+        let content = iconContent
+
+        if let action {
+            Button(action: action) {
+                content
+            }
+            .buttonStyle(.plain)
+        } else {
+            content
+        }
     }
 
     private var iconTint: Color {
@@ -404,12 +408,18 @@ public struct DSIconButton: View {
         }
     }
 
-    private var iconUsesGlass: Bool {
-        switch style {
-        case .tertiary:
-            return false
-        default:
-            return true
+    private var iconContent: some View {
+        IconTileSurface(
+            size: size.dimension,
+            cornerRadius: DSRadii.lg,
+            fill: iconBackground,
+            borderColor: style == .tertiary ? .clear : Color.border,
+            borderWidth: style == .tertiary ? 0 : 1,
+            shadow: DSShadows.soft,
+            usesGlass: usesGlass,
+            isInteractive: action != nil
+        ) {
+            SketchIcon(systemName: icon, size: size.iconSize, color: iconTint)
         }
     }
 }

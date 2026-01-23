@@ -22,14 +22,15 @@ public struct GlassSurfaceModifier: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let effectiveCornerRadius = min(cornerRadius, DSRadii.xl)
+        let shape = RoundedRectangle(cornerRadius: effectiveCornerRadius, style: .continuous)
 
         if #available(iOS 26.0, *) {
             let glass = Glass.regular.tint(tint)
             let finalGlass = isInteractive ? glass.interactive() : glass
 
             content
-                .glassEffect(finalGlass, in: .rect(cornerRadius: cornerRadius))
+                .glassEffect(finalGlass, in: .rect(cornerRadius: effectiveCornerRadius))
                 .overlay(shape.stroke(borderColor, lineWidth: 1))
                 .shadow(color: shadow.color, radius: shadow.radius, x: shadow.x, y: shadow.y)
         } else {

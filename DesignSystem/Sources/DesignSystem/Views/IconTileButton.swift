@@ -15,7 +15,7 @@ public struct IconTileButton: View {
         iconSize: CGFloat = 18,
         tint: Color = Color.themePrimary,
         backgroundTint: Color = Color.surfaceVariant.opacity(0.8),
-        usesGlass: Bool = true,
+        usesGlass: Bool = false,
         action: (() -> Void)? = nil
     ) {
         self.systemName = systemName

@@ -65,9 +65,9 @@ public struct DefaultTheme: Theme, Sendable {
         )
 
         let shadows = ShadowScale(
-            soft: ShadowToken(color: .black.opacity(0.05), radius: 8, y: 4),
-            card: ShadowToken(color: .black.opacity(0.08), radius: 16, y: 8),
-            lifted: ShadowToken(color: .black.opacity(0.14), radius: 22, y: 12)
+            soft: ShadowToken(color: .black.opacity(0.06), radius: 8, y: 4),
+            card: ShadowToken(color: .black.opacity(0.12), radius: 16, y: 8),
+            lifted: ShadowToken(color: .black.opacity(0.16), radius: 22, y: 12)
         )
 
         let glass = GlassTokens(

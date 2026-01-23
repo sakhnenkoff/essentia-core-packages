@@ -12,7 +12,7 @@ public struct CardSurfaceModifier: ViewModifier {
 
     public init(
         cornerRadius: CGFloat = DSRadii.lg,
-        tint: Color = Color.surfaceVariant.opacity(0.6),
+        tint: Color = Color.surface,
         usesGlass: Bool = false,
         isInteractive: Bool = false,
         borderColor: Color = Color.border,
@@ -31,19 +31,19 @@ public struct CardSurfaceModifier: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let effectiveCornerRadius = min(cornerRadius, DSRadii.xl)
+        let shape = RoundedRectangle(cornerRadius: effectiveCornerRadius, style: .continuous)
 
         if #available(iOS 26.0, *), usesGlass {
             let glass = Glass.regular.tint(tint)
             let finalGlass = isInteractive ? glass.interactive() : glass
 
             content
-                .glassEffect(finalGlass, in: .rect(cornerRadius: cornerRadius))
+                .glassEffect(finalGlass, in: .rect(cornerRadius: effectiveCornerRadius))
                 .overlay(shape.stroke(borderColor, lineWidth: 1))
                 .shadow(color: shadowColor, radius: shadowRadius, x: 0, y: shadowYOffset)
         } else {
             content
-                .background(shape.fill(Color.surface))
                 .background(shape.fill(tint))
                 .overlay(shape.stroke(borderColor, lineWidth: 1))
                 .shadow(color: shadowColor, radius: shadowRadius, x: 0, y: shadowYOffset)
@@ -54,7 +54,7 @@ public struct CardSurfaceModifier: ViewModifier {
 public extension View {
     func cardSurface(
         cornerRadius: CGFloat = DSRadii.lg,
-        tint: Color = Color.surfaceVariant.opacity(0.6),
+        tint: Color = Color.surface,
         usesGlass: Bool = false,
         isInteractive: Bool = false,
         borderColor: Color = Color.border,
