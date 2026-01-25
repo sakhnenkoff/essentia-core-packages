@@ -1,169 +1,78 @@
 import SwiftUI
 
 /// A selectable choice button for onboarding flows, surveys, and multi-select interfaces.
-/// Displays a title, optional subtitle, optional icon, and selection state.
+/// Displays a title, optional icon, and selection state with sketch-style aesthetics.
 public struct DSChoiceButton: View {
     let title: String
-    let subtitle: String?
     let icon: String?
     let isSelected: Bool
     let action: () -> Void
 
+    @State private var tapCount = 0
+
     public init(
         title: String,
-        subtitle: String? = nil,
         icon: String? = nil,
         isSelected: Bool = false,
         action: @escaping () -> Void
     ) {
         self.title = title
-        self.subtitle = subtitle
         self.icon = icon
         self.isSelected = isSelected
         self.action = action
     }
 
     public var body: some View {
-        Button(action: action) {
-            let shape = RoundedRectangle(cornerRadius: DSSpacing.smd, style: .continuous)
-            let borderColor = isSelected ? Color.textPrimary.opacity(0.6) : Color.border
-            let borderWidth: CGFloat = isSelected ? 1.5 : 1
-            let backgroundColor = isSelected ? Color.surfaceVariant : Color.surface
+        Button {
+            tapCount += 1
+            action()
+        } label: {
+            let shape = RoundedRectangle(cornerRadius: DSRadii.md, style: .continuous)
 
             HStack(spacing: DSSpacing.smd) {
+                // Leading icon with sketch style
                 if let icon {
-                    Image(systemName: icon)
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(isSelected ? Color.textPrimary : Color.textSecondary)
-                        .frame(width: 24)
+                    SketchIcon(
+                        systemName: icon,
+                        size: 18,
+                        color: isSelected ? Color.themePrimary : Color.textSecondary
+                    )
+                    .frame(width: 24)
                 }
 
-                VStack(alignment: .leading, spacing: DSSpacing.xs) {
-                    Text(title)
-                        .font(.headlineSmall())
-                        .foregroundStyle(Color.textPrimary)
-
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(.bodySmall())
-                            .foregroundStyle(Color.textSecondary)
-                    }
-                }
+                // Title
+                Text(title)
+                    .font(.bodyMedium())
+                    .foregroundStyle(isSelected ? Color.textPrimary : Color.textSecondary)
 
                 Spacer(minLength: DSSpacing.sm)
 
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 22))
-                    .foregroundStyle(isSelected ? Color.textPrimary : Color.textTertiary)
+                // Selection indicator - simple dot
+                Circle()
+                    .fill(isSelected ? Color.themePrimary : Color.border)
+                    .frame(width: 8, height: 8)
             }
             .padding(.horizontal, DSSpacing.md)
-            .padding(.vertical, DSSpacing.sm)
-            .frame(minHeight: 48)
-            .background(backgroundColor)
+            .padding(.vertical, DSSpacing.smd)
+            .frame(minHeight: 52)
+            .background(isSelected ? Color.themePrimary.opacity(0.08) : Color.surface)
             .overlay(
-                shape.stroke(borderColor, lineWidth: borderWidth)
+                shape.stroke(
+                    isSelected ? Color.themePrimary.opacity(0.3) : Color.border,
+                    lineWidth: 1
+                )
             )
             .clipShape(shape)
         }
         .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Convenience Initializers
-
-public extension DSChoiceButton {
-    /// Creates a simple choice button with just a title.
-    static func simple(
-        title: String,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> DSChoiceButton {
-        DSChoiceButton(
-            title: title,
-            isSelected: isSelected,
-            action: action
-        )
-    }
-
-    /// Creates an icon choice button with icon and title.
-    static func withIcon(
-        title: String,
-        icon: String,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> DSChoiceButton {
-        DSChoiceButton(
-            title: title,
-            icon: icon,
-            isSelected: isSelected,
-            action: action
-        )
+        .sensoryFeedback(.selection, trigger: tapCount)
+        .animation(.easeInOut(duration: 0.2), value: isSelected)
     }
 }
 
 // MARK: - Previews
 
-#Preview("Unselected") {
-    VStack(spacing: DSSpacing.sm) {
-        DSChoiceButton(
-            title: "Option One",
-            isSelected: false
-        ) {}
-
-        DSChoiceButton(
-            title: "With Subtitle",
-            subtitle: "This is a description",
-            isSelected: false
-        ) {}
-
-        DSChoiceButton(
-            title: "With Icon",
-            icon: "star.fill",
-            isSelected: false
-        ) {}
-
-        DSChoiceButton(
-            title: "Full Option",
-            subtitle: "Icon and subtitle",
-            icon: "heart.fill",
-            isSelected: false
-        ) {}
-    }
-    .padding()
-    .background(Color.backgroundPrimary)
-}
-
-#Preview("Selected") {
-    VStack(spacing: DSSpacing.sm) {
-        DSChoiceButton(
-            title: "Option One",
-            isSelected: true
-        ) {}
-
-        DSChoiceButton(
-            title: "With Subtitle",
-            subtitle: "This is a description",
-            isSelected: true
-        ) {}
-
-        DSChoiceButton(
-            title: "With Icon",
-            icon: "star.fill",
-            isSelected: true
-        ) {}
-
-        DSChoiceButton(
-            title: "Full Option",
-            subtitle: "Icon and subtitle",
-            icon: "heart.fill",
-            isSelected: true
-        ) {}
-    }
-    .padding()
-    .background(Color.backgroundPrimary)
-}
-
-#Preview("Mixed Selection") {
+#Preview("Choice Buttons") {
     VStack(spacing: DSSpacing.sm) {
         DSChoiceButton(
             title: "Launch fast",
@@ -181,6 +90,11 @@ public extension DSChoiceButton {
             title: "Measure growth",
             icon: "chart.line.uptrend.xyaxis",
             isSelected: true
+        ) {}
+
+        DSChoiceButton(
+            title: "Simple option",
+            isSelected: false
         ) {}
     }
     .padding()

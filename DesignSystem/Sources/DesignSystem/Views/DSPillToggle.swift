@@ -23,37 +23,45 @@ public struct DSPillToggle: View {
         HStack(spacing: 0) {
             // On pill (icon)
             Button {
-                withAnimation(.easeInOut(duration: 0.2)) { isOn = true }
+                guard !isOn else { return }
+                withAnimation(.spring(duration: 0.3, bounce: 0.15)) { isOn = true }
             } label: {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(isOn ? Color.textOnPrimary : Color.textTertiary)
-                    .frame(width: 44, height: 44)
-                    .background(isOn ? Color.themePrimary : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: DSRadii.sm))
+                    .frame(width: 52, height: 52)
+                    .background(
+                        RoundedRectangle(cornerRadius: DSRadii.sm)
+                            .fill(isOn ? Color.themePrimary : Color.clear)
+                    )
             }
             .buttonStyle(.plain)
 
             // Off pill (dot)
             Button {
-                withAnimation(.easeInOut(duration: 0.2)) { isOn = false }
+                guard isOn else { return }
+                withAnimation(.spring(duration: 0.3, bounce: 0.15)) { isOn = false }
             } label: {
                 Circle()
                     .fill(!isOn ? Color.themePrimary : Color.textTertiary)
-                    .frame(width: 6, height: 6)
-                    .frame(width: 44, height: 44)
-                    .background(!isOn ? Color.surfaceVariant : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: DSRadii.sm))
+                    .frame(width: 8, height: 8)
+                    .frame(width: 52, height: 52)
+                    .background(
+                        RoundedRectangle(cornerRadius: DSRadii.sm)
+                            .fill(!isOn ? Color.surfaceVariant : Color.clear)
+                    )
             }
             .buttonStyle(.plain)
         }
-        .padding(4)
+        .padding(5)
         .background(Color.surface)
-        .clipShape(RoundedRectangle(cornerRadius: DSRadii.md))
+        .clipShape(RoundedRectangle(cornerRadius: DSRadii.lg))
         .overlay(
-            RoundedRectangle(cornerRadius: DSRadii.md)
+            RoundedRectangle(cornerRadius: DSRadii.lg)
                 .stroke(Color.border, lineWidth: 1)
         )
+        .animation(.spring(duration: 0.3, bounce: 0.15), value: isOn)
+        .sensoryFeedback(.selection, trigger: isOn)
     }
 }
 

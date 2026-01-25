@@ -24,19 +24,24 @@ public struct GlassSurfaceModifier: ViewModifier {
     public func body(content: Content) -> some View {
         let effectiveCornerRadius = min(cornerRadius, DSRadii.xl)
         let shape = RoundedRectangle(cornerRadius: effectiveCornerRadius, style: .continuous)
+        let hasBorder = borderColor != .clear
 
         if #available(iOS 26.0, *) {
             let glass = Glass.regular.tint(tint)
             let finalGlass = isInteractive ? glass.interactive() : glass
 
+            // Liquid Glass handles its own edges - don't add extra overlays
             content
                 .glassEffect(finalGlass, in: .rect(cornerRadius: effectiveCornerRadius))
-                .overlay(shape.stroke(borderColor, lineWidth: 1))
-                .shadow(color: shadow.color, radius: shadow.radius, x: shadow.x, y: shadow.y)
         } else {
+            // Fallback for pre-iOS 26: use material + border + shadow
             content
                 .background(.ultraThinMaterial, in: shape)
-                .overlay(shape.stroke(borderColor, lineWidth: 1))
+                .overlay {
+                    if hasBorder {
+                        shape.stroke(borderColor, lineWidth: 1)
+                    }
+                }
                 .shadow(color: shadow.color, radius: shadow.radius, x: shadow.x, y: shadow.y)
         }
     }

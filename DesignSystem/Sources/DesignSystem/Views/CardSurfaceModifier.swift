@@ -38,10 +38,9 @@ public struct CardSurfaceModifier: ViewModifier {
             let glass = Glass.regular.tint(tint)
             let finalGlass = isInteractive ? glass.interactive() : glass
 
+            // Glass handles its own edges and shadows - don't add extra
             content
                 .glassEffect(finalGlass, in: .rect(cornerRadius: effectiveCornerRadius))
-                .overlay(shape.stroke(borderColor, lineWidth: 1))
-                .shadow(color: shadowColor, radius: shadowRadius, x: 0, y: shadowYOffset)
         } else {
             content
                 .background(shape.fill(tint))

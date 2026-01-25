@@ -12,6 +12,8 @@ public struct DSButton: View {
     let isFullWidth: Bool
     let action: () -> Void
 
+    @State private var tapCount = 0
+
     public init(
         title: String,
         icon: String? = nil,
@@ -32,9 +34,14 @@ public struct DSButton: View {
         self.action = action
     }
 
+    private var shouldProvideHaptics: Bool {
+        style == .primary || style == .destructive
+    }
+
     public var body: some View {
         Button(action: {
             if !isLoading && isEnabled {
+                tapCount += 1
                 action()
             }
         }) {
@@ -42,6 +49,9 @@ public struct DSButton: View {
         }
         .disabled(!isEnabled || isLoading)
         .opacity(isEnabled ? 1.0 : 0.5)
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: tapCount) { _, _ in
+            shouldProvideHaptics
+        }
     }
 
     @ViewBuilder

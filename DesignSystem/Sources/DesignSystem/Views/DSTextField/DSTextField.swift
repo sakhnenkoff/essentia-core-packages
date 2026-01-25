@@ -1,5 +1,13 @@
 import SwiftUI
 
+/// Visual style for DSTextField.
+public enum DSTextFieldStyle {
+    /// Bordered style with rounded corners and full border.
+    case bordered
+    /// Minimal style with only an underline.
+    case underline
+}
+
 /// A styled text field following the design system.
 /// Supports icons, placeholder text, and various keyboard types.
 public struct DSTextField: View {
@@ -9,6 +17,9 @@ public struct DSTextField: View {
     let keyboardType: UIKeyboardType
     let autocapitalization: TextInputAutocapitalization
     let isSecure: Bool
+    let style: DSTextFieldStyle
+
+    @FocusState private var isFocused: Bool
 
     public init(
         placeholder: String,
@@ -16,7 +27,8 @@ public struct DSTextField: View {
         icon: String? = nil,
         keyboardType: UIKeyboardType = .default,
         autocapitalization: TextInputAutocapitalization = .sentences,
-        isSecure: Bool = false
+        isSecure: Bool = false,
+        style: DSTextFieldStyle = .bordered
     ) {
         self.placeholder = placeholder
         self._text = text
@@ -24,11 +36,19 @@ public struct DSTextField: View {
         self.keyboardType = keyboardType
         self.autocapitalization = autocapitalization
         self.isSecure = isSecure
+        self.style = style
     }
 
     public var body: some View {
-        let shape = RoundedRectangle(cornerRadius: DSSpacing.smd, style: .continuous)
+        switch style {
+        case .bordered:
+            borderedStyle
+        case .underline:
+            underlineStyle
+        }
+    }
 
+    private var fieldContent: some View {
         HStack(spacing: DSSpacing.smd) {
             if let icon {
                 Image(systemName: icon)
@@ -40,23 +60,48 @@ public struct DSTextField: View {
             if isSecure {
                 SecureField(placeholder, text: $text)
                     .textInputAutocapitalization(autocapitalization)
+                    .focused($isFocused)
             } else {
                 TextField(placeholder, text: $text)
                     .keyboardType(keyboardType)
                     .textInputAutocapitalization(autocapitalization)
+                    .focused($isFocused)
             }
         }
         .font(.bodyMedium())
         .foregroundStyle(Color.textPrimary)
         .tint(Color.themePrimary)
-        .padding(.horizontal, DSSpacing.md)
-        .padding(.vertical, DSSpacing.smd)
-        .frame(minHeight: 48)
-        .background(Color.surface)
-        .overlay(
-            shape.stroke(Color.border, lineWidth: 1)
-        )
-        .clipShape(shape)
+    }
+
+    private var borderedStyle: some View {
+        let shape = RoundedRectangle(cornerRadius: DSSpacing.smd, style: .continuous)
+
+        return fieldContent
+            .padding(.horizontal, DSSpacing.md)
+            .padding(.vertical, DSSpacing.smd)
+            .frame(minHeight: 48)
+            .background(Color.surface)
+            .overlay(
+                shape.stroke(Color.border, lineWidth: 1)
+            )
+            .clipShape(shape)
+    }
+
+    private var isActive: Bool {
+        isFocused || !text.isEmpty
+    }
+
+    private var underlineStyle: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            fieldContent
+                .padding(.vertical, DSSpacing.smd)
+                .frame(height: 44)
+
+            Rectangle()
+                .fill(isActive ? Color.themePrimary : Color.border)
+                .frame(height: isActive ? 2 : 1)
+        }
+        .animation(.easeInOut(duration: 0.2), value: isActive)
     }
 }
 
@@ -193,6 +238,51 @@ public extension DSTextField {
 
         DSTextField.email(
             text: .constant("user@example.com")
+        )
+    }
+    .padding()
+    .background(Color.backgroundPrimary)
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Underline Style") {
+    VStack(spacing: DSSpacing.lg) {
+        DSTextField(
+            placeholder: "Enter your name",
+            text: .constant(""),
+            icon: "person",
+            style: .underline
+        )
+
+        DSTextField(
+            placeholder: "Email address",
+            text: .constant("hello@example.com"),
+            icon: "envelope",
+            style: .underline
+        )
+
+        DSTextField(
+            placeholder: "No icon",
+            text: .constant(""),
+            style: .underline
+        )
+    }
+    .padding()
+    .background(Color.backgroundPrimary)
+}
+
+#Preview("Underline Style - Dark") {
+    VStack(spacing: DSSpacing.lg) {
+        DSTextField(
+            placeholder: "Type something",
+            text: .constant(""),
+            style: .underline
+        )
+
+        DSTextField(
+            placeholder: "With value",
+            text: .constant("Hello"),
+            style: .underline
         )
     }
     .padding()
