@@ -14,6 +14,7 @@ public struct TimePill: View {
     private let mode: Mode
     let isHighlighted: Bool
     let usesGlass: Bool
+    let showsAccessory: Bool
     let accessibilityLabel: String?
     @State private var isShowingPicker = false
 
@@ -28,11 +29,13 @@ public struct TimePill: View {
         title: String,
         isHighlighted: Bool = true,
         usesGlass: Bool = false,
+        showsAccessory: Bool = false,
         accessibilityLabel: String? = nil
     ) {
         self.mode = .staticTitle(title)
         self.isHighlighted = isHighlighted
         self.usesGlass = usesGlass
+        self.showsAccessory = showsAccessory
         self.accessibilityLabel = accessibilityLabel
     }
 
@@ -41,11 +44,13 @@ public struct TimePill: View {
         time: Binding<Date>,
         isHighlighted: Bool = true,
         usesGlass: Bool = false,
+        showsAccessory: Bool = true,
         accessibilityLabel: String? = nil
     ) {
         self.mode = .interactive(time)
         self.isHighlighted = isHighlighted
         self.usesGlass = usesGlass
+        self.showsAccessory = showsAccessory
         self.accessibilityLabel = accessibilityLabel
     }
 
@@ -86,23 +91,48 @@ public struct TimePill: View {
     }
 
     private var pillContent: some View {
-        let textContent = Text(displayTitle)
-            .font(.bodyMedium())
-            .foregroundStyle(isHighlighted ? Color.themePrimary : Color.textSecondary)
-            .padding(.horizontal, DSSpacing.md)
-            .padding(.vertical, DSSpacing.smd)
+        let textContent = HStack(spacing: DSSpacing.xs) {
+            Text(displayTitle)
+                .font(.bodyMedium())
+                .foregroundStyle(isHighlighted ? Color.themePrimary : Color.textSecondary)
+
+            if showsAccessory {
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.textTertiary)
+            }
+        }
+        .padding(.horizontal, DSSpacing.md)
+        .padding(.vertical, DSSpacing.smd)
 
         return Group {
             if usesGlass {
-                textContent
-                    .background(Capsule().fill(Color.clear))
-                    .glassSurface(
-                        cornerRadius: DSRadii.pill,
-                        tint: isHighlighted ? Color.themePrimary.opacity(0.15) : DesignSystem.tokens.glass.tint,
-                        borderColor: .clear,
-                        shadow: DSShadows.soft,
-                        isInteractive: isInteractive
-                    )
+                let tint = isHighlighted ? Color.themePrimary.opacity(0.15) : DesignSystem.tokens.glass.tint
+
+                if #available(iOS 26.0, *) {
+                    let glass = Glass.regular.tint(tint)
+                    let finalGlass = isInteractive ? glass.interactive() : glass
+
+                    textContent
+                        .background {
+                            Capsule()
+                                .fill(Color.clear)
+                                .glassEffect(finalGlass, in: .capsule)
+                        }
+                        .clipShape(Capsule())
+                } else {
+                    textContent
+                        .background(Capsule().fill(Color.clear))
+                        .glassSurface(
+                            cornerRadius: DSRadii.pill,
+                            tint: tint,
+                            borderColor: .clear,
+                            shadow: DSShadows.soft,
+                            isInteractive: isInteractive,
+                            shape: .capsule
+                        )
+                        .clipShape(Capsule())
+                }
             } else {
                 textContent
                     .background(Capsule().fill(isHighlighted ? Color.surface : Color.surfaceVariant))
@@ -142,6 +172,7 @@ public struct TimePill: View {
         TimePill(title: "17:00")
         TimePill(title: "08:30", isHighlighted: false)
         TimePill(title: "11:15", usesGlass: true)
+        TimePill(title: "11:15", usesGlass: true, showsAccessory: true)
     }
     .padding()
     .background(Color.backgroundPrimary)
@@ -155,6 +186,7 @@ public struct TimePill: View {
             VStack(spacing: DSSpacing.md) {
                 TimePill(time: $time, accessibilityLabel: "Reminder time")
                 TimePill(time: $time, usesGlass: true, accessibilityLabel: "Reminder time")
+                TimePill(time: $time, usesGlass: true, showsAccessory: false, accessibilityLabel: "Reminder time")
 
                 Text("Selected: \(time.formatted(date: .omitted, time: .shortened))")
                     .font(.bodySmall())

@@ -7,6 +7,7 @@ public struct IconTileSurface<Content: View>: View {
     let borderColor: Color
     let borderWidth: CGFloat
     let shadow: ShadowToken
+    let glassTint: Color?
     let usesGlass: Bool
     let isInteractive: Bool
     let content: Content
@@ -18,6 +19,7 @@ public struct IconTileSurface<Content: View>: View {
         borderColor: Color = Color.border,
         borderWidth: CGFloat = 1,
         shadow: ShadowToken = DSShadows.soft,
+        glassTint: Color? = DesignSystem.tokens.glass.tint,
         usesGlass: Bool = false,
         isInteractive: Bool = false,
         @ViewBuilder content: () -> Content
@@ -28,6 +30,7 @@ public struct IconTileSurface<Content: View>: View {
         self.borderColor = borderColor
         self.borderWidth = borderWidth
         self.shadow = shadow
+        self.glassTint = glassTint
         self.usesGlass = usesGlass
         self.isInteractive = isInteractive
         self.content = content()
@@ -40,9 +43,10 @@ public struct IconTileSurface<Content: View>: View {
             .background(tile.fill(fill))
 
         if usesGlass {
+            let resolvedTint = glassTint ?? .clear
             base.glassSurface(
                 cornerRadius: cornerRadius,
-                tint: DesignSystem.tokens.glass.tint,
+                tint: resolvedTint,
                 borderColor: borderColor,
                 shadow: shadow,
                 isInteractive: isInteractive

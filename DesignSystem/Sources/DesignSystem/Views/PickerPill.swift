@@ -20,23 +20,26 @@ public struct PickerPill: View {
 
     public var body: some View {
         let shape = RoundedRectangle(cornerRadius: DSRadii.pill, style: .continuous)
+        let effectiveUsesGlass = usesGlass || isInteractive
         let base = Text(title)
             .font(.bodyMedium())
             .foregroundStyle(isHighlighted ? Color.textOnPrimary : Color.themePrimary)
             .padding(.horizontal, DSSpacing.md)
             .padding(.vertical, DSSpacing.smd)
             .background(
-                shape.fill(isHighlighted ? Color.themePrimary : Color.surface)
+                shape.fill(effectiveUsesGlass ? Color.clear : (isHighlighted ? Color.themePrimary : Color.surface))
             )
 
-        if usesGlass {
+        if effectiveUsesGlass {
             base.glassSurface(
                 cornerRadius: DSRadii.pill,
                 tint: isHighlighted ? Color.themePrimary.opacity(0.3) : DesignSystem.tokens.glass.tint,
                 borderColor: isHighlighted ? Color.clear : Color.themePrimary.opacity(0.25),
                 shadow: DSShadows.soft,
-                isInteractive: isInteractive
+                isInteractive: isInteractive,
+                shape: .capsule
             )
+            .clipShape(shape)
         } else {
             base.overlay(
                 shape.stroke(

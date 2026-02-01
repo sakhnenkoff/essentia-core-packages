@@ -7,32 +7,49 @@ public struct DSSegmentedControl<T: Hashable>: View {
     let items: [T]
     @Binding var selection: T
     let labelProvider: (T) -> String
+    let usesGlass: Bool
 
     @Namespace private var namespace
 
     public init(
         items: [T],
         selection: Binding<T>,
+        usesGlass: Bool = true,
         labelProvider: @escaping (T) -> String
     ) {
         self.items = items
         self._selection = selection
+        self.usesGlass = usesGlass
         self.labelProvider = labelProvider
     }
 
     public var body: some View {
-        HStack(spacing: 0) {
+        let shape = RoundedRectangle(cornerRadius: DSRadii.md, style: .continuous)
+        let base = HStack(spacing: 0) {
             ForEach(items, id: \.self) { item in
                 segmentButton(for: item)
             }
         }
         .padding(DSSpacing.xs)
-        .background(Color.surface)
-        .clipShape(RoundedRectangle(cornerRadius: DSRadii.md))
-        .overlay(
-            RoundedRectangle(cornerRadius: DSRadii.md)
-                .stroke(Color.border, lineWidth: 1)
-        )
+        .background(shape.fill(usesGlass ? Color.clear : Color.surface))
+        .clipShape(shape)
+
+        Group {
+            if usesGlass {
+                base
+                    .glassSurface(
+                        cornerRadius: DSRadii.md,
+                        tint: DesignSystem.tokens.glass.tint,
+                        borderColor: Color.border,
+                        shadow: DSShadows.soft,
+                        isInteractive: true
+                    )
+                    .clipShape(shape)
+            } else {
+                base
+                    .overlay(shape.stroke(Color.border, lineWidth: 1))
+            }
+        }
         .sensoryFeedback(.selection, trigger: selection)
     }
 
@@ -66,8 +83,8 @@ public struct DSSegmentedControl<T: Hashable>: View {
 
 public extension DSSegmentedControl where T == String {
     /// Creates a segmented control with string items.
-    init(items: [String], selection: Binding<String>) {
-        self.init(items: items, selection: selection) { $0 }
+    init(items: [String], selection: Binding<String>, usesGlass: Bool = true) {
+        self.init(items: items, selection: selection, usesGlass: usesGlass) { $0 }
     }
 }
 

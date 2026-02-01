@@ -92,6 +92,8 @@ public struct ToastView: View {
         }
         .padding(.horizontal, DSSpacing.md)
         .padding(.vertical, DSSpacing.md)
+        .contentShape(.rect)
+        .allowsHitTesting(true)
         .glassSurface(
             cornerRadius: DSRadii.md,
             tint: toast.style.backgroundColor.opacity(0.08),

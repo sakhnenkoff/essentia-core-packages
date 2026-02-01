@@ -367,6 +367,8 @@ public struct DSIconButton: View {
     let style: DSButtonStyle
     let size: DSIconButtonSize
     let usesGlass: Bool
+    let showsBackground: Bool
+    let glassTint: Color?
     let accessibilityLabel: String?
     let action: (() -> Void)?
 
@@ -375,6 +377,8 @@ public struct DSIconButton: View {
         style: DSButtonStyle = .tertiary,
         size: DSIconButtonSize = .medium,
         usesGlass: Bool = false,
+        showsBackground: Bool = true,
+        glassTint: Color? = DesignSystem.tokens.glass.tint,
         accessibilityLabel: String? = nil,
         action: (() -> Void)? = nil
     ) {
@@ -382,6 +386,8 @@ public struct DSIconButton: View {
         self.style = style
         self.size = size
         self.usesGlass = usesGlass
+        self.showsBackground = showsBackground
+        self.glassTint = glassTint
         self.accessibilityLabel = accessibilityLabel
         self.action = action
     }
@@ -423,18 +429,26 @@ public struct DSIconButton: View {
         }
     }
 
+    @ViewBuilder
     private var iconContent: some View {
-        IconTileSurface(
-            size: size.dimension,
-            cornerRadius: DSRadii.lg,
-            fill: iconBackground,
-            borderColor: style == .tertiary ? .clear : Color.border,
-            borderWidth: style == .tertiary ? 0 : 1,
-            shadow: DSShadows.soft,
-            usesGlass: usesGlass,
-            isInteractive: action != nil
-        ) {
+        if showsBackground {
+            IconTileSurface(
+                size: size.dimension,
+                cornerRadius: DSRadii.lg,
+                fill: iconBackground,
+                borderColor: style == .tertiary ? .clear : Color.border,
+                borderWidth: style == .tertiary ? 0 : 1,
+                shadow: DSShadows.soft,
+                glassTint: glassTint,
+                usesGlass: usesGlass,
+                isInteractive: action != nil
+            ) {
+                SketchIcon(systemName: icon, size: size.iconSize, color: iconTint)
+            }
+        } else {
             SketchIcon(systemName: icon, size: size.iconSize, color: iconTint)
+                .frame(width: size.dimension, height: size.dimension)
+                .contentShape(.rect)
         }
     }
 }
