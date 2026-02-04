@@ -247,14 +247,38 @@ private struct DSButtonPressStyle: ButtonStyle {
         configuration.label
             .scaleEffect(pressScale(isPressed: configuration.isPressed))
             .overlay(
-                shape
-                    .fill(pressFill(isPressed: configuration.isPressed))
+                Group {
+                    if shouldShowFill {
+                        shape
+                            .fill(pressFill(isPressed: configuration.isPressed))
+                    }
+                }
             )
             .overlay(
-                shape
-                    .strokeBorder(pressBorder(isPressed: configuration.isPressed), lineWidth: pressBorderWidth(isPressed: configuration.isPressed))
+                Group {
+                    if shouldShowBorder {
+                        shape
+                            .strokeBorder(
+                                pressBorder(isPressed: configuration.isPressed),
+                                lineWidth: pressBorderWidth(isPressed: configuration.isPressed)
+                            )
+                    }
+                }
             )
             .animation(.spring(response: 0.22, dampingFraction: 0.72), value: configuration.isPressed)
+    }
+
+    private var shouldShowFill: Bool {
+        switch style {
+        case .primary, .tertiary:
+            return false
+        case .secondary, .destructive:
+            return true
+        }
+    }
+
+    private var shouldShowBorder: Bool {
+        style == .secondary
     }
 
     private func pressScale(isPressed: Bool) -> CGFloat {
@@ -273,11 +297,11 @@ private struct DSButtonPressStyle: ButtonStyle {
         guard isPressed else { return .clear }
         switch style {
         case .primary:
-            return Color.white.opacity(0.08)
+            return .clear
         case .secondary:
             return Color.themePrimary.opacity(0.10)
         case .tertiary:
-            return Color.textPrimary.opacity(0.05)
+            return .clear
         case .destructive:
             return Color.white.opacity(0.06)
         }
@@ -291,9 +315,9 @@ private struct DSButtonPressStyle: ButtonStyle {
         case .tertiary:
             return Color.clear
         case .primary:
-            return Color.white.opacity(0.18)
+            return .clear
         case .destructive:
-            return Color.white.opacity(0.12)
+            return .clear
         }
     }
 
@@ -302,9 +326,7 @@ private struct DSButtonPressStyle: ButtonStyle {
         switch style {
         case .secondary:
             return 1.0
-        case .primary, .destructive:
-            return 0.5
-        case .tertiary:
+        case .primary, .destructive, .tertiary:
             return 0
         }
     }
