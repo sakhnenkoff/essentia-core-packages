@@ -40,15 +40,12 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/SwiftfulThinking/IdentifiableByString.git", from: "1.0.0"),
         .package(url: "https://github.com/jrendel/SwiftKeychainWrapper.git", from: "4.0.0")
     ],
     targets: [
         .target(
             name: "Domain",
-            dependencies: [
-                .product(name: "IdentifiableByString", package: "IdentifiableByString")
-            ],
+            dependencies: [],
             path: "Domain/Sources/Domain"
         ),
         .target(
