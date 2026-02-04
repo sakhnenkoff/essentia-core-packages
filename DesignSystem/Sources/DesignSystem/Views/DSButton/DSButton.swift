@@ -47,6 +47,7 @@ public struct DSButton: View {
         }) {
             buttonLabel
         }
+        .buttonStyle(DSButtonPressStyle(style: style, cornerRadius: size.cornerRadius))
         .disabled(!isEnabled || isLoading)
         .opacity(isEnabled ? 1.0 : 0.5)
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: tapCount) { _, _ in
@@ -231,6 +232,80 @@ public enum DSButtonStyle {
             return Color.error.opacity(0.25)
         default:
             return .clear
+        }
+    }
+}
+
+// MARK: - Button Press Style
+
+private struct DSButtonPressStyle: ButtonStyle {
+    let style: DSButtonStyle
+    let cornerRadius: CGFloat
+
+    func makeBody(configuration: Configuration) -> some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        configuration.label
+            .scaleEffect(pressScale(isPressed: configuration.isPressed))
+            .overlay(
+                shape
+                    .fill(pressFill(isPressed: configuration.isPressed))
+            )
+            .overlay(
+                shape
+                    .strokeBorder(pressBorder(isPressed: configuration.isPressed), lineWidth: pressBorderWidth(isPressed: configuration.isPressed))
+            )
+            .animation(.spring(response: 0.22, dampingFraction: 0.72), value: configuration.isPressed)
+    }
+
+    private func pressScale(isPressed: Bool) -> CGFloat {
+        guard isPressed else { return 1.0 }
+        switch style {
+        case .primary:
+            return 1.02
+        case .secondary, .destructive:
+            return 0.99
+        case .tertiary:
+            return 0.98
+        }
+    }
+
+    private func pressFill(isPressed: Bool) -> Color {
+        guard isPressed else { return .clear }
+        switch style {
+        case .primary:
+            return Color.white.opacity(0.08)
+        case .secondary:
+            return Color.themePrimary.opacity(0.10)
+        case .tertiary:
+            return Color.textPrimary.opacity(0.05)
+        case .destructive:
+            return Color.white.opacity(0.06)
+        }
+    }
+
+    private func pressBorder(isPressed: Bool) -> Color {
+        guard isPressed else { return .clear }
+        switch style {
+        case .secondary:
+            return Color.themePrimary.opacity(0.55)
+        case .tertiary:
+            return Color.clear
+        case .primary:
+            return Color.white.opacity(0.18)
+        case .destructive:
+            return Color.white.opacity(0.12)
+        }
+    }
+
+    private func pressBorderWidth(isPressed: Bool) -> CGFloat {
+        guard isPressed else { return 0 }
+        switch style {
+        case .secondary:
+            return 1.0
+        case .primary, .destructive:
+            return 0.5
+        case .tertiary:
+            return 0
         }
     }
 }
