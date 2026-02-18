@@ -1,6 +1,7 @@
 import SwiftUI
 
 public enum ThemePreset: String, CaseIterable, Sendable {
+    case clean
     case defaultTheme
     case classicMono
     case editorialGarden
@@ -9,6 +10,8 @@ public enum ThemePreset: String, CaseIterable, Sendable {
 
     public var displayName: String {
         switch self {
+        case .clean:
+            "Clean"
         case .defaultTheme:
             "Default"
         case .classicMono:
@@ -24,6 +27,8 @@ public enum ThemePreset: String, CaseIterable, Sendable {
 
     public func makeTheme() -> any Theme {
         switch self {
+        case .clean:
+            CleanTheme()
         case .defaultTheme:
             CloudPetalTheme()
         case .classicMono:
